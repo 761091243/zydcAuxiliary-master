@@ -1,0 +1,89 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=<'hello'>">
+    <title>房源竞价</title>
+    <meta name="robots" content="noindex,nofollow">
+
+    <link rel="stylesheet" href="../static/css/base.css">
+    <link rel="stylesheet" href="../static/css/frame.css">
+    <link rel="stylesheet" href="../static/css/indexbody.css">
+    <link rel="stylesheet" href="../static/css/login.css">
+    <script src="../static/js/jquery-1.10.2.js"></script>
+
+</head>
+
+<body>
+
+<script>
+    function add() {
+        var x;
+        var r=confirm("确定执行吗!");
+        if (r==true) {
+            x = "正在执行中....";
+            document.getElementById("demo").innerHTML = x;
+
+            var json1 = {
+                "userName": $("#userName").val(),
+                "userPwd": $("#userPwd").val(),
+                "adPositionId": $("#adPositionId").val(),
+                "currentYuanBaoNum": $("#currentYuanBaoNum").val(),
+                "propUrl": $("#propUrl").val()
+            };
+
+            $.ajax({
+                type: "POST",
+                contentType: "application/json;charset=UTF-8",
+                url: "http://www.dwp2020vip.top:8061/auction/favorite",
+                // url: "http://localhost:8061/auction/favorite",
+                data: JSON.stringify(json1),
+                dataType: 'json',
+                success: function (data) {
+                    document.getElementById("demo").innerHTML = data.text;
+                }
+            });
+
+        }
+
+
+    }
+
+
+</script>
+
+<div class="login-box">
+    <div class="login-top"></div>
+    <div class="login-main">
+        <h1 style="color: red; " align="center">房源广告位竞价</h1>
+        <form>
+
+            <div class="login-item">
+                <input id="userName" type="text" name="userName" placeholder="用户名">
+            </div>
+            <div class="login-item">
+                <input id="userPwd" type="password" name="userPwd" placeholder="密码">
+            </div>
+            <div class="login-item">
+                <input id="adPositionId" type="text" name="adPositionId" placeholder="收藏夹的排序：1~10">
+            </div>
+
+
+
+            <div class="login-foot">
+                <a href="https://spring.io/" target="_blank">---</a>
+                <a href="https://sz.centanet.com/?sem=baidu&hmpl=pzpc" target="_blank" class="float-right">置业英雄成长系统</a>
+            </div>
+
+        </form>
+        <div class="login-item">
+            <button name="sm1" onclick="add();">开始</button>
+        </div>
+        <div style="width: 340px;height: 100px; overflow-x:auto ;overflow-y: auto;">
+            <p id="demo"></p>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

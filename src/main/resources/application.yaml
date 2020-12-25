@@ -1,0 +1,48 @@
+server:
+  port: 8061
+
+spring:
+  #数据源配置
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://42.192.42.75:3306/zydc?zeroDateTimeBehavior=convertToNull&autoReconnect=true&characterEncoding=UTF-8&characterSetResults=UTF-8
+    username: root
+    password: qq19961314520
+
+  thymeleaf:
+    #缓冲的配置
+    cache: false
+    check-template: true
+    check-template-location: true
+    #开启MVC thymeleaf 视图解析
+    enabled: true
+    encoding: utf-8
+    mode: HTML5
+    prefix: classpath:/templates/
+    suffix: .html
+  resources:
+    static-locations: classpath:/static/
+  mvc:
+    static-path-pattern: /static/**
+
+#  #给项目来个名字
+#  application:
+#    name: rabbitmq-zydcAuction
+#  #配置rabbitMq 服务器
+#  rabbitmq:
+#    host: 42.192.42.75
+#    port: 5672
+#    username: guest
+#    password: guest
+#    #虚拟host 可以不设置,使用server默认host
+#    virtual-host: zydcAuction
+
+
+
+#mybatis-plush配置
+mybatis-plus:
+  type-aliases-package: com.drjy.pojo
+  mapper-locations: classpath:/mybatis/mappers/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
