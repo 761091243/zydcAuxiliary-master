@@ -38,7 +38,7 @@ public class AuctionController {
     }
 
     // 收藏夹竞标
-//    @CrossOrigin(origins = "*", maxAge = 3600) // 跨越问题
+    @CrossOrigin(origins = "*", maxAge = 3600) // 跨越问题
     @PostMapping("/favorite")
     public SysResult favorite(@RequestBody AuctionVO auctionVO) {
 //        System.out.println(1/0);
@@ -46,8 +46,9 @@ public class AuctionController {
     }
 
     // 登录保存token到redis
+    @CrossOrigin(origins = "*", maxAge = 3600) // 跨越问题
     @PostMapping("/login")
-    public SysResult login(@RequestBody AuctionVO auctionVO){
+    public SysResult login(@RequestBody AuctionVO auctionVO) {
         return auctionService.login(auctionVO);
     }
 

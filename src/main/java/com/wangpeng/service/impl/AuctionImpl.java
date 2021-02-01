@@ -11,11 +11,16 @@
 package com.wangpeng.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.wangpeng.config.SysResult;
+import com.wangpeng.mapper.UserPowerMapper;
 import com.wangpeng.pojo.AuctionVO;
+import com.wangpeng.pojo.UserPower;
 import com.wangpeng.service.AuctionService;
 import com.wangpeng.utils.HttpUtil;
 import com.wangpeng.utils.RequestUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -23,6 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 〈一句话功能简述〉<br>
@@ -35,6 +41,10 @@ import java.util.Map;
 @Service
 public class AuctionImpl implements AuctionService {
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+    @Autowired
+    private UserPowerMapper userPowerMapper;
 
     @Override
     public SysResult start(AuctionVO auctionVO) {
@@ -91,18 +101,19 @@ public class AuctionImpl implements AuctionService {
         System.out.println("收藏夹竞标------------------------------");
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd :hh:mm:ss");
         System.out.println("请求入参数----------" + auctionVO + dateFormat.format(new Date()));
-        // 验证账号密码是否正确
-        String token = RequestUtil.login(auctionVO.getUserName(), auctionVO.getUserPwd());
-        if (StringUtils.isEmpty(token)) {
-            return new SysResult(200, "账号或密码错误", true);
+
+        Object tokenValue = redisTemplate.opsForValue().get(auctionVO.getUserName());
+        if (StringUtils.isEmpty(tokenValue)){
+            return new SysResult(200,"请先登录！",true);
         }
+        String token = tokenValue.toString();
 
         // 获取收藏夹排序的信息
         String id = "";
         String favoriteStr = HttpUtil.httpGet("https://sz.centanet.com/partner/jifen/AdPosition/GetMyAdPreItems?pageIndex=1&pageSize=10", token);
         JSONObject favoriteult = JSONObject.parseObject(favoriteStr);
         Map<String, Object> resultMap = (Map<String, Object>) favoriteult.get("data");
-        List<Map<String, Map<String,Object>>> favoriteList = (List<Map<String, Map<String, Object>>>) resultMap.get("list");
+        List<Map<String, Map<String, Object>>> favoriteList = (List<Map<String, Map<String, Object>>>) resultMap.get("list");
         Map<String, Map<String, Object>> map1 = favoriteList.get(Integer.valueOf(auctionVO.getAdPositionId()) - 1);
         Map<String, Object> map2 = map1.get("AdPositionCompetePre");
         Object id1 = map2.get("Id");
@@ -134,18 +145,18 @@ public class AuctionImpl implements AuctionService {
                 System.out.println("识别成功结果为:" + resultCode);
 
                 //  竞标
-                String url1 = "https://sz.centanet.com/partner/jifen/AdPosition/AuctionNewPre?id="+id+"&verifyCode="+resultCode;
+                String url1 = "https://sz.centanet.com/partner/jifen/AdPosition/AuctionNewPre?id=" + id + "&verifyCode=" + resultCode;
                 String resultJB = HttpUtil.httpGet(url1, token);
                 System.out.println(resultJB);
-                return new SysResult(200,resultJB,true);
+                return new SysResult(200, resultJB, true);
 
             } else {
                 System.out.println("识别失败原因为:" + jsonObject.getString("message"));
-                return new SysResult(200,"验证码识别失败",true);
+                return new SysResult(200, "验证码识别失败", true);
             }
         } catch (Exception e) {
             System.out.println("识别失败异常:");
-            return new SysResult(200,"验证码识别异常",true);
+            return new SysResult(200, "验证码识别异常", true);
         }
 
     }
@@ -155,11 +166,20 @@ public class AuctionImpl implements AuctionService {
         System.out.println("登录保存token到redis-------------------------");
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd :hh:mm:ss");
         System.out.println("登录入参数----------" + auctionVO + dateFormat.format(new Date()));
+        // 是否有权限
+        UserPower userPower = userPowerMapper.selectOne(new QueryWrapper<UserPower>().eq("user_name", auctionVO.getUserName()));
+        if (StringUtils.isEmpty(userPower)){
+            System.out.println("没有权限--------");
+            return new SysResult(200, "没有权限，请联系管理员QQ:761091243", true);
+        }
         // 验证账号密码是否正确
         String token = RequestUtil.login(auctionVO.getUserName(), auctionVO.getUserPwd());
         if (StringUtils.isEmpty(token)) {
             return new SysResult(200, "账号或密码错误", true);
         }
-        return null;
+        // 添加token到redis（key是用户名）
+        redisTemplate.opsForValue().set(auctionVO.getUserName(), token, 1, TimeUnit.HOURS);
+        System.out.println("登录成功-------------------------");
+        return new SysResult(200, "登录成功，有效期为1个小时", true);
     }
 }

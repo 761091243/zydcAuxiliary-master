@@ -46,10 +46,38 @@
 
         }
 
-
     }
 
+    function login() {
+        var y;
+        var r=confirm("确定登录吗!");
+        if (r == true) {
+            y = "正在登录中....";
+            document.getElementById("demo").innerHTML = y;
 
+            var json1 = {
+                "userName": $("#userName").val(),
+                "userPwd": $("#userPwd").val(),
+                "adPositionId": $("#adPositionId").val(),
+                "currentYuanBaoNum": $("#currentYuanBaoNum").val(),
+                "propUrl": $("#propUrl").val()
+            };
+
+            $.ajax({
+                type: "POST",
+                contentType: "application/json;charset=UTF-8",
+                url: "http://www.dwp2020vip.top:8061/auction/login",
+                // url: "http://localhost:8061/auction/login",
+                data: JSON.stringify(json1),
+                dataType: 'json',
+                success: function (data) {
+                    document.getElementById("demo").innerHTML = data.text;
+                }
+            });
+
+        }
+
+    }
 </script>
 
 <div class="login-box">
@@ -76,6 +104,9 @@
             </div>
 
         </form>
+        <div class="login-item">
+            <button name="sm1" onclick="login();">登录</button>
+        </div>
         <div class="login-item">
             <button name="sm1" onclick="add();">开始</button>
         </div>

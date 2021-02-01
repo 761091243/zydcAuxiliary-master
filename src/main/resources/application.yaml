@@ -8,6 +8,11 @@ spring:
     url: jdbc:mysql://42.192.42.75:3306/zydc?zeroDateTimeBehavior=convertToNull&autoReconnect=true&characterEncoding=UTF-8&characterSetResults=UTF-8
     username: root
     password: qq19961314520
+  redis:
+    database: 0
+    host: 42.192.42.75         # Redis服务器地址
+    port: 6379              # Redis服务器连接端口
+    password:               # Redis服务器连接密码（默认为空）
 
   thymeleaf:
     #缓冲的配置
