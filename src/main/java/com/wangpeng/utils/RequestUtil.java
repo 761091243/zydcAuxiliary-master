@@ -73,5 +73,18 @@ public class RequestUtil {
         return arrayList;
     }
 
+    // 签到
+    public static String sign(String token) {
+        String loginUrl = "https://sz.centanet.com/partner/jifen/My/Sign";
+
+        // 发送签到请求
+        String loginResultStr = HttpUtil.httpPost(loginUrl, "", token);
+
+        JSONObject loginResult = JSONObject.parseObject(loginResultStr);
+        Map<String, String> data = (Map<String, String>) loginResult.get("data");
+        String reamark = data.get("Reamark");
+        return reamark;
+    }
+
 
 }
