@@ -22,6 +22,14 @@ public class IndexController {
     public String to2(){
         return "index2";
     }
+    @GetMapping("/autoSign")
+    public String autoSign(){
+        return "autoSign";
+    }
+
+
+
+
 
     @GetMapping("/test")
     public String test(){

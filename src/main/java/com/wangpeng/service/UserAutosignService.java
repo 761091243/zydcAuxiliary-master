@@ -15,6 +15,8 @@ public interface UserAutosignService {
 
     List<UserAutosign> findSure();
 
+    SysResult see(String username, String password);
+
 
 
 }
