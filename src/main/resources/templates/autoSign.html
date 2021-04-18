@@ -87,7 +87,9 @@
                 } else {
                     $("#switch_type").text("开启状态：已开启");
                 }
-                if (null != data.data.logs) {
+                if (null == data.data.logs || 0 == data.data.logs.length) {
+                    $("#log1").text("执行详情：暂无记录");
+                }else {
                     var html='';
                     $.each(data.data.logs,function(index,item){
 
