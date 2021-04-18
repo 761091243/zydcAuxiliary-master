@@ -44,13 +44,13 @@ public class UserAutosignImpl implements UserAutosignService {
         // 是否已绑定
         UserAutosign userDB = userAutosignMapper.selectOne(new QueryWrapper<UserAutosign>().eq("username", userAutosign.getUsername()));
         if (userDB != null) {
-            return new SysResult(200, "该用户已绑定", true);
+            return new SysResult(200, "该用户已绑定!", true);
         }
         // 绑定
         userAutosign.setExpireTime(DateUtil.toDate(new Date(), 3));
         userAutosignMapper.insert(userAutosign);
         // 给邀请人奖励天数
-        if (null != userAutosign.getInvitationCode()) {
+        if (!StringUtils.isEmpty(userAutosign.getInvitationCode())) {
             UserAutosign invitationUserDB = userAutosignMapper.selectOne(new QueryWrapper<UserAutosign>().eq("username", userAutosign.getInvitationCode()));
             if (null == invitationUserDB) {
                 return new SysResult(200, "未找到邀请人：" + userAutosign.getInvitationCode(), true);
@@ -58,7 +58,7 @@ public class UserAutosignImpl implements UserAutosignService {
             invitationUserDB.setExpireTime(DateUtil.toDate(invitationUserDB.getExpireTime(), BaseConstant.BIND_REWARD_TIME));
             userAutosignMapper.updateById(invitationUserDB);
         }
-        return new SysResult(200, "绑定成功请返回登陆！", true);
+        return new SysResult(200, "绑定成功！", true);
     }
 
     /**
@@ -85,10 +85,10 @@ public class UserAutosignImpl implements UserAutosignService {
             return new SysResult(200,"请先绑定用户！",true);
         }
         // 查询历史签到
-        List<UserAutosignLog> logs = userAutosignLogMapper.selectList(new QueryWrapper<UserAutosignLog>().eq("user_id", userDB.getId()));
+        List<UserAutosignLog> logs = userAutosignLogMapper.selectList(new QueryWrapper<UserAutosignLog>().eq("user_id", userDB.getId()).orderByDesc("sign_time").last("limit 0,7"));
         Map<String, Object> map = new HashMap<>();
         map.put("user",userDB);
         map.put("logs",logs);
-        return new SysResult(200,"查询成功",map);
+        return new SysResult(200,"查询成功!",map);
     }
 }

@@ -2,7 +2,7 @@
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=<'hello'>">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>自动签到</title>
     <meta name="robots" content="noindex,nofollow">
 
@@ -12,47 +12,198 @@
     <link rel="stylesheet" href="../static/css/login.css">
     <script src="../static/js/jquery-1.10.2.js"></script>
 
+    <style type="text/css">
+        body {
+            margin:0;
+            background:#f2f2f2 url(../static/images/c.jpg) no-repeat center top;
+        }
+    </style>
 </head>
 
 <body>
 
 <script>
+    function bindPage() {
+        $("#app1").hide();
+        $("#app2").show();
 
+    }
 
+    function historyPage() {
+        $("#app2").hide();
+        $("#app1").show();
+
+    }
+
+    function bind() {
+        if ($("#name").val() == '' || $("#username2").val() == '' || $("#password2").val() == '') {
+            alert("请填写完整");
+            return;
+        }
+
+        var json1 = {
+            "name": $("#name").val(),
+            "username": $("#username2").val(),
+            "password": $("#password2").val(),
+            "invitationCode": $("#invitationCode").val(),
+        };
+
+        $.ajax({
+            type: "POST",
+            contentType: "application/json;charset=UTF-8",
+            url: "/Autosign/bind",
+            data: JSON.stringify(json1),
+            dataType: 'json',
+            success: function (data) {
+                document.getElementById("demo").innerHTML = data.text;
+            }
+        });
+    }
+
+    function history() {
+        if ($("#username").val() == '' || $("#password").val() == '') {
+            alert("请填写完整");
+            return;
+        }
+
+        var json1 = {
+            "name": $("#name").val(),
+            "username": $("#username").val(),
+            "password": $("#password").val(),
+        };
+
+        $.ajax({
+            type: "POST",
+            contentType: "application/json;charset=UTF-8",
+            url: "/Autosign/see",
+            data: JSON.stringify(json1),
+            dataType: 'json',
+            success: function (data) {
+                document.getElementById("demo2").innerHTML = data.text;
+
+                $("#expire_time").text("到期时间：" + toDate(data.data.user.expireTime));
+                if (data.data.user.switchType = 0) {
+                    $("#switch_type").text("开启状态：未开启");
+                } else {
+                    $("#switch_type").text("开启状态：已开启");
+                }
+                if (null != data.data.logs) {
+                    var html='';
+                    $.each(data.data.logs,function(index,item){
+
+                        html += "<span>" + "执行详情：" + item.details + "</span>";
+                        html += "<span>" + "执行时间：" + toDate(item.signTime) + "</span>" + "</br>";
+
+                    })
+                    $("#log1").html(html);
+                }
+            }
+        });
+    }
+
+    function tipsOn() {
+        alert("邀请用户注册绑定，免费获得30天自动签到！有任何问题请联系QQ:761091243");
+    }
+
+    // 日期转换
+    function toDate(time) {
+        var now = new Date(time);
+        var year = now.getFullYear();
+        var month =(now.getMonth() + 1).toString();
+        var day = (now.getDate()).toString();
+        if (month.length == 1) {
+            month = "0" + month;
+        }
+        if (day.length == 1) {
+            day = "0" + day;
+        }
+        var dateTime = year + "-" + month + "-" +  day;
+        return dateTime;
+    }
 </script>
 
 <div class="login-box">
     <div class="login-top"></div>
     <div class="login-main">
-        <h1 style="color: red; " align="center">自动签到</h1>
-        <form>
+        <div id="app1">
+            <h1 style="color: red; " align="center">自动签到-查看记录</h1>
+            <form>
+
+                <div class="login-item">
+                    <input id="username" type="text" name="username" placeholder="用户名">
+                </div>
+                <div class="login-item">
+                    <input id="password" type="password" name="password" placeholder="密码">
+                </div>
+
+
+                <div class="login-foot">
+                    <a href="/index/autoSign" target="_blank" class="float-left" style="color: red">----</a>
+                    <a href="https://sz.centanet.com/?sem=baidu&hmpl=pzpc" target="_blank"
+                       class="float-right">中原地产首页</a>
+                </div>
+
+            </form>
 
             <div class="login-item">
-                <input id="userName" type="text" name="userName" placeholder="用户名">
-            </div>
-            <div class="login-item">
-                <input id="userPwd" type="password" name="userPwd" placeholder="密码">
+                <button name="sm1" onclick="history();">签到历史</button>
             </div>
 
-
-
-
-            <div class="login-foot">
-                <a href="/index/autoSign" target="_blank" class="float-left" style="color: red">----</a>
-                <a href="https://sz.centanet.com/?sem=baidu&hmpl=pzpc" target="_blank" class="float-right">中原地产首页</a>
+            <div style="width: 340px;height: 200px; overflow-x:auto ;overflow-y: auto;">
+                <p id="demo2"></p>
+                <div>
+                    <div id="expire_time"></div>
+                    <div id="switch_type"></div>
+                </div>
+                <div id="log1"></div>
             </div>
-
-        </form>
-
-        <div class="login-item">
-            <button name="sm1" onclick="add();">签到历史</button>
         </div>
 
+        <div id="app2" style="display: none">
+            <h1 style="color: red; " align="center">自动签到-绑定</h1>
+            <form>
+
+                <div class="login-item">
+                    <input id="name" type="text" name="name" placeholder="昵称">
+                </div>
+                <div class="login-item">
+                    <input id="username2" type="text" name="username" placeholder="用户名">
+                </div>
+                <div class="login-item">
+                    <input id="password2" type="password" name="password" placeholder="密码">
+                </div>
+                <div class="login-item">
+                    <input id="invitationCode" type="invitationCode" name="invitationCode" placeholder="邀请人账号(选填)">
+                </div>
+
+
+                <div class="login-foot">
+                    <a href="/index/autoSign" target="_blank" class="float-left" style="color: red">----</a>
+                    <a href="https://sz.centanet.com/?sem=baidu&hmpl=pzpc" target="_blank"
+                       class="float-right">中原地产首页</a>
+                </div>
+
+            </form>
+
+            <div class="login-item">
+                <button name="sm1" onclick="bind();">绑定账号</button>
+            </div>
 
         <div style="width: 340px;height: 100px; overflow-x:auto ;overflow-y: auto;">
             <p id="demo"></p>
         </div>
-
+        </div>
+    </div>
+    <div class="login-item">
+        <button name="sm1" style="width:60px;height:30px;background-color: #669900;color: white;border: none"
+                onclick="historyPage();">签到历史
+        </button>
+        <button name="sm1" style="width:60px;height:30px;background-color: #669900;color: white;border: none"
+                onclick="bindPage();">绑定
+        </button>
+        <button name="sm1" style="width:60px;height:30px;background-color: #669900;color: white;border: none"
+                onclick="tipsOn();">提示！
+        </button>
     </div>
 </div>
 </body>

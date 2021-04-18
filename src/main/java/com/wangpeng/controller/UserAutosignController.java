@@ -5,10 +5,7 @@ import com.wangpeng.pojo.UserAutosign;
 import com.wangpeng.service.UserAutosignService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author Dunn
@@ -33,13 +30,11 @@ public class UserAutosignController {
 
     /**
      * 查询用户信息及历史签到
-     * @param username
-     * @param password
      * @return
      */
     @PostMapping("/see")
-    public SysResult see(String username, String password){
-        return userAutosignService.see(username,password);
+    public SysResult see(@RequestBody UserAutosign user){
+        return userAutosignService.see(user.getUsername(),user.getPassword());
     }
 
 }

@@ -14,5 +14,5 @@ import java.io.Serializable;
 public class SysResult implements Serializable {
     private Integer code;
     private String text;
-    private Object date;
+    private Object data;
 }
