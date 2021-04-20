@@ -5,20 +5,16 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
-import java.io.Serializable;
+import java.util.Date;
 
-/**
- * @author dengwangpeng
- * @dete 2021/2/1 - 21:09
- */
 @Data
-@TableName("t_user_power")
-public class UserPower implements Serializable {
+@TableName("t_user_power_log")
+public class UserPowerLog {
 
     @TableId(type = IdType.AUTO)
     private Integer id;
-    private String userName;
+    private Integer userId;
     private String userNick;
-
-
+    private String details;
+    private Date powerTime;
 }

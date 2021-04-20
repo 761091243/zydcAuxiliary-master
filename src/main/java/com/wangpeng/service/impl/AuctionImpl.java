@@ -13,9 +13,11 @@ package com.wangpeng.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.wangpeng.config.SysResult;
+import com.wangpeng.mapper.UserPowerLogMapper;
 import com.wangpeng.mapper.UserPowerMapper;
 import com.wangpeng.pojo.AuctionVO;
 import com.wangpeng.pojo.UserPower;
+import com.wangpeng.pojo.UserPowerLog;
 import com.wangpeng.service.AuctionService;
 import com.wangpeng.utils.HttpUtil;
 import com.wangpeng.utils.RequestUtil;
@@ -45,6 +47,8 @@ public class AuctionImpl implements AuctionService {
     private RedisTemplate redisTemplate;
     @Autowired
     private UserPowerMapper userPowerMapper;
+    @Autowired
+    private UserPowerLogMapper userPowerLogMapper;
 
     @Override
     public SysResult start(AuctionVO auctionVO) {
@@ -98,10 +102,7 @@ public class AuctionImpl implements AuctionService {
 
     @Override
     public SysResult favorite(AuctionVO auctionVO) {
-        System.out.println("收藏夹竞标------------------------------");
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd :hh:mm:ss");
-        System.out.println("请求入参数----------" + auctionVO + dateFormat.format(new Date()));
-
+        System.out.println("收藏夹竞标------请求入参数--------" + auctionVO.toString());
         Object tokenValue = redisTemplate.opsForValue().get(auctionVO.getUserName());
         if (StringUtils.isEmpty(tokenValue)){
             return new SysResult(200,"请先登录！",true);
@@ -147,7 +148,13 @@ public class AuctionImpl implements AuctionService {
                 //  竞标
                 String url1 = "https://sz.centanet.com/partner/jifen/AdPosition/AuctionNewPre?id=" + id + "&verifyCode=" + resultCode;
                 String resultJB = HttpUtil.httpGet(url1, token);
-                System.out.println(resultJB);
+                // 添加竞标记录
+                UserPower userPower = userPowerMapper.selectOne(new QueryWrapper<UserPower>().eq("user_name", auctionVO.getUserName()));
+                UserPowerLog userPowerLog = new UserPowerLog();
+                userPowerLog.setUserId(userPower.getId());
+                userPowerLog.setUserNick(userPower.getUserNick());
+                userPowerLog.setDetails(resultJB);
+                userPowerLogMapper.insert(userPowerLog);
                 return new SysResult(200, resultJB, true);
 
             } else {
