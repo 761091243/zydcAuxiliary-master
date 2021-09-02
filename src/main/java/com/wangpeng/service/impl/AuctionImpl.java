@@ -135,7 +135,7 @@ public class AuctionImpl implements AuctionService {
         JSONObject obj = new JSONObject();
         obj.put("username", username);
         obj.put("password", password);
-
+//        obj.put("typeid", "7");
         obj.put("image", image);
         try {
             String url = "http://api.ttshitu.com/base64";

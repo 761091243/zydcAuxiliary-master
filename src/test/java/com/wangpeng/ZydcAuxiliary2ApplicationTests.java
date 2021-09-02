@@ -1,5 +1,6 @@
 package com.wangpeng;
 
+import com.alibaba.fastjson.JSONObject;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
@@ -9,8 +10,11 @@ import com.alipay.api.response.AlipayFundTransOrderQueryResponse;
 import com.alipay.api.response.AlipayTradeQueryResponse;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.wangpeng.utils.HttpUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.io.IOException;
 
 @SpringBootTest
 class ZydcAuxiliary2ApplicationTests {
@@ -33,5 +37,60 @@ class ZydcAuxiliary2ApplicationTests {
         }
 */
     }
+
+    /**
+     * 测试图鉴接口时长
+     */
+    @Test
+    public void demo2() throws IOException {
+        long startTime = System.currentTimeMillis();
+        String username = "qq761091243";
+        //你的密码
+        String password = "19961314520";
+        //图片转换过的base64编码
+        String image = "R0lGODlhUAAjAPcAAAAAAAAAMwAAZgAAmQAAzAAA/wArAAArMwArZgArmQArzAAr/wBVAABVMwBVZgBVmQBVzABV/wCAAACAMwCAZgCAmQCAzACA/wCqAACqMwCqZgCqmQCqzACq/wDVAADVMwDVZgDVmQDVzADV/wD/AAD/MwD/ZgD/mQD/zAD//zMAADMAMzMAZjMAmTMAzDMA/zMrADMrMzMrZjMrmTMrzDMr/zNVADNVMzNVZjNVmTNVzDNV/zOAADOAMzOAZjOAmTOAzDOA/zOqADOqMzOqZjOqmTOqzDOq/zPVADPVMzPVZjPVmTPVzDPV/zP/ADP/MzP/ZjP/mTP/zDP//2YAAGYAM2YAZmYAmWYAzGYA/2YrAGYrM2YrZmYrmWYrzGYr/2ZVAGZVM2ZVZmZVmWZVzGZV/2aAAGaAM2aAZmaAmWaAzGaA/2aqAGaqM2aqZmaqmWaqzGaq/2bVAGbVM2bVZmbVmWbVzGbV/2b/AGb/M2b/Zmb/mWb/zGb//5kAAJkAM5kAZpkAmZkAzJkA/5krAJkrM5krZpkrmZkrzJkr/5lVAJlVM5lVZplVmZlVzJlV/5mAAJmAM5mAZpmAmZmAzJmA/5mqAJmqM5mqZpmqmZmqzJmq/5nVAJnVM5nVZpnVmZnVzJnV/5n/AJn/M5n/Zpn/mZn/zJn//8wAAMwAM8wAZswAmcwAzMwA/8wrAMwrM8wrZswrmcwrzMwr/8xVAMxVM8xVZsxVmcxVzMxV/8yAAMyAM8yAZsyAmcyAzMyA/8yqAMyqM8yqZsyqmcyqzMyq/8zVAMzVM8zVZszVmczVzMzV/8z/AMz/M8z/Zsz/mcz/zMz///8AAP8AM/8AZv8Amf8AzP8A//8rAP8rM/8rZv8rmf8rzP8r//9VAP9VM/9VZv9Vmf9VzP9V//+AAP+AM/+AZv+Amf+AzP+A//+qAP+qM/+qZv+qmf+qzP+q///VAP/VM//VZv/Vmf/VzP/V////AP//M///Zv//mf//zP///wAAAAAAAAAAAAAAACH5BAEAAPwALAAAAABQACMAAAj/AAHsA0CQ4MCCAhEmRHiwYEODCh8udBixIsOK+zJq3Mixo8ePIEOKHGlwpMmTKFN6LKmypcuXGVnCnEkTpMCaOHNqlKmz58ubPhvqVAh0ZVGTDm0SrUk0aUeeIiMabTqT4cOPUJVa5bhVaNSpXJ1uPBqSKtanWXc6nYiW7MGTZuGmVdsUqtixSOPmdRv2IlijJCneLTt4atquY/nShVgY79W9bvWqjZq08WLLfRVLHkiZJWaJKBE7jnl3rlSvnRUnnvt3dOaLPPl+fhxabNa6dUlHZi16b2LDuCvfNj0bq0ziwUsO7k3bONnSLUvbPTy7K2LWrRdrb6t69WbOKQvjN3Ye/jv2ts6Zx3Sp/nzfoD3d/4Y/lL59uffzl9XPP2z//28ByN9SFglmIGMHToTgggo2CBpBAQEAOw==";
+        JSONObject obj = new JSONObject();
+        obj.put("username", username);
+        obj.put("password", password);
+        //一、图片文字类型(默认 3 数英混合)：
+        //1 : 纯数字
+        //1001：纯数字2
+        //2 : 纯英文
+        //1002：纯英文2
+        //3 : 数英混合
+        //1003：数英混合2
+        //4 : 闪动GIF
+        //7 : 无感学习(独家)
+        //11 : 计算题
+        //1005:  快速计算题
+        //16 : 汉字
+        //32 : 通用文字识别(证件、单据)
+        //66:  问答题
+        //49 :recaptcha图片识别 参考 https://shimo.im/docs/RPGcTpxdVgkkdQdY
+        //二、图片旋转角度类型：
+        //29 :  旋转类型
+
+        //三、图片坐标点选类型：
+        //19 :  1个坐标
+        //20 :  3个坐标
+        //21 :  3 ~ 5个坐标
+        //22 :  5 ~ 8个坐标
+        //27 :  1 ~ 4个坐标
+        //48 : 轨迹类型
+        //四、缺口识别
+        //18：缺口识别
+        //五、拼图识别
+        //53：拼图识别
+        obj.put("typeid", "1");
+        obj.put("image", image);
+        String url = "http://api.ttshitu.com/base64";
+        String ret = HttpUtil.httpRequestData(url, obj);
+
+        System.out.println(ret);
+
+        long endTime = System.currentTimeMillis();
+        System.out.println("用时：" + (endTime - startTime));
+    }
+
 
 }
