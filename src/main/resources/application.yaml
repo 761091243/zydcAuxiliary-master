@@ -5,12 +5,12 @@ spring:
   #数据源配置
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://42.192.42.75:3306/zydc?zeroDateTimeBehavior=convertToNull&autoReconnect=true&characterEncoding=UTF-8&characterSetResults=UTF-8
+    url: jdbc:mysql://39.101.163.223:3306/zydc?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT
     username: root
-    password: qq19961314520
+    password: 123456
   redis:
     database: 0
-    host: 42.192.42.75         # Redis服务器地址
+    host: 39.101.163.223         # Redis服务器地址
     port: 6379              # Redis服务器连接端口
     password:               # Redis服务器连接密码（默认为空）
 
