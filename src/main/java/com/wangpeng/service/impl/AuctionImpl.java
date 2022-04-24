@@ -138,6 +138,7 @@ public class AuctionImpl implements AuctionService {
 //        obj.put("typeid", "7");
         obj.put("image", image);
         try {
+            // 图鉴
             String url = "http://api.ttshitu.com/base64";
             String ret = HttpUtil.httpRequestData(url, obj);
             JSONObject jsonObject = JSONObject.parseObject(ret);

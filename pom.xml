@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.wangpeng</groupId>
-    <artifactId>zydc-auxiliary2</artifactId>
+    <artifactId>zydcAuxiliary-master</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>zydc-auxiliary2</name>
+    <name>zydcAuxiliary-master</name>
     <description>Demo project for Spring Boot</description>
 
     <properties>
