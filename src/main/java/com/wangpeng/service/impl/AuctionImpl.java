@@ -10,6 +10,7 @@
  */
 package com.wangpeng.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.wangpeng.config.SysResult;
@@ -49,6 +50,8 @@ public class AuctionImpl implements AuctionService {
     private UserPowerMapper userPowerMapper;
     @Autowired
     private UserPowerLogMapper userPowerLogMapper;
+
+    private static final String IS_AUCTION = "Auction:";
 
     @Override
     public SysResult start(AuctionVO auctionVO) {
@@ -121,6 +124,12 @@ public class AuctionImpl implements AuctionService {
         id = id1.toString();
         System.out.println("收藏夹id为：" + id + map2.get("AdName"));
 
+        // 是否已竞拍过
+        String isAuction = (String) redisTemplate.opsForValue().get(IS_AUCTION + auctionVO.getUserName() + id);
+        if (!StringUtils.isEmpty(isAuction)){
+            System.out.println("已竞拍成功,此次不会覆盖");
+            return new SysResult(200, "已竞拍成功,此次不会覆盖", true);
+        }
 
         // 获取验证码图片base64
         String base64Result = HttpUtil.httpGet("https://sz.centanet.com/partner/jifen/My/GetVerifyCodeBase64", token);
@@ -150,6 +159,13 @@ public class AuctionImpl implements AuctionService {
                 //  竞标
                 String url1 = "https://sz.centanet.com/partner/jifen/AdPosition/AuctionNewPre?id=" + id + "&verifyCode=" + resultCode;
                 String resultJB = HttpUtil.httpGet(url1, token);
+
+                // 记录成功 {"code":0,"msg":"success","data":{"IsSuccess":true,"Reamark":"参与成功，将有机会拍得此广告位！"}}
+                JSONObject jbJson = JSON.parseObject(resultJB);
+                if (jbJson.getJSONObject("data").getBoolean("IsSuccess")){
+                    redisTemplate.opsForValue().set(IS_AUCTION + auctionVO.getUserName() + id, resultJB, 1, TimeUnit.HOURS);
+                }
+
                 // 添加竞标记录
                 UserPower userPower = userPowerMapper.selectOne(new QueryWrapper<UserPower>().eq("user_name", auctionVO.getUserName()));
                 UserPowerLog userPowerLog = new UserPowerLog();
