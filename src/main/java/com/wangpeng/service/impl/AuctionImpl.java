@@ -132,6 +132,7 @@ public class AuctionImpl implements AuctionService {
         String password = "19961314520";
         //图片转换过的base64编码
         String image = base64;
+        System.out.println("图片base64 = "+ image);
         JSONObject obj = new JSONObject();
         obj.put("username", username);
         obj.put("password", password);
