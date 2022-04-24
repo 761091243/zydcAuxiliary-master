@@ -81,7 +81,7 @@ class ZydcAuxiliary2ApplicationTests {
         //18：缺口识别
         //五、拼图识别
         //53：拼图识别
-        obj.put("typeid", "1");
+        obj.put("typeid", "1001");
         obj.put("image", image);
         String url = "http://api.ttshitu.com/base64";
         String ret = HttpUtil.httpRequestData(url, obj);
