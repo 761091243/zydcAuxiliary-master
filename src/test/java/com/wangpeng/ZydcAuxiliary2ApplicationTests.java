@@ -1,23 +1,26 @@
 package com.wangpeng;
 
 import com.alibaba.fastjson.JSONObject;
-import com.alipay.api.AlipayApiException;
-import com.alipay.api.AlipayClient;
-import com.alipay.api.DefaultAlipayClient;
-import com.alipay.api.request.AlipayFundTransOrderQueryRequest;
-import com.alipay.api.request.AlipayTradeQueryRequest;
-import com.alipay.api.response.AlipayFundTransOrderQueryResponse;
-import com.alipay.api.response.AlipayTradeQueryResponse;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.wangpeng.utils.HttpUtil;
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
-@SpringBootTest
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = {ZydcAuxiliary2Application.class})
 class ZydcAuxiliary2ApplicationTests {
+
+    @Autowired
+    private RedisTemplate redisTemplate;
+
+
+    private static final String IS_AUCTION = "Auction:";
 
     @Test
     void contextLoads() throws Exception {
@@ -92,5 +95,10 @@ class ZydcAuxiliary2ApplicationTests {
         System.out.println("用时：" + (endTime - startTime));
     }
 
+
+    @Test
+    public void redisDemo1(){
+        redisTemplate.opsForValue().set(IS_AUCTION + "18820241680" + "666","cg",1, TimeUnit.HOURS);
+    }
 
 }
