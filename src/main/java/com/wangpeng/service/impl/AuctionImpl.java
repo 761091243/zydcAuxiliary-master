@@ -22,6 +22,8 @@ import com.wangpeng.pojo.UserPowerLog;
 import com.wangpeng.service.AuctionService;
 import com.wangpeng.utils.HttpUtil;
 import com.wangpeng.utils.RequestUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -43,6 +45,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Service
 public class AuctionImpl implements AuctionService {
+    private static final Logger log = LoggerFactory.getLogger(AuctionImpl.class);
 
     @Autowired
     private RedisTemplate redisTemplate;
@@ -60,15 +63,14 @@ public class AuctionImpl implements AuctionService {
             return new SysResult(200, "金币不能大于200!", true);
         }
         // 验证账号密码是否正确
-        System.out.println("开始竞价--------------------------------------");
+        log.info("开始竞价--------------------------------------");
         // 验证账号密码是否正确
         String token = RequestUtil.login(auctionVO.getUserName(), auctionVO.getUserPwd());
         if (StringUtils.isEmpty(token)) {
             return new SysResult(200, "账号或密码错误", true);
         }
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd :hh:mm:ss");
-        System.out.println("登录入参数-----" + auctionVO + dateFormat.format(new Date()));
+        log.info("-----登录入参数={}",auctionVO.toString());
 
         // 去掉手机网页中的m.
         auctionVO.setPropUrl(auctionVO.getPropUrl().replace("m.", ""));
@@ -104,9 +106,15 @@ public class AuctionImpl implements AuctionService {
 
 
     @Override
-    public SysResult favorite(AuctionVO auctionVO) {
-        System.out.println("收藏夹竞标------请求入参数--------" + auctionVO.toString());
-        Object tokenValue = redisTemplate.opsForValue().get(auctionVO.getUserName());
+    public SysResult favorite(AuctionVO vo) {
+        log.info("收藏夹竞标------请求入参数={}",vo.toString());
+        if (StringUtils.isEmpty(vo.getUserName()) || StringUtils.isEmpty(vo.getUserPwd())){
+            return new SysResult(200,"请输入账号密码！",true);
+        }
+        if (StringUtils.isEmpty(vo.getAdPositionId())){
+            return new SysResult(200,"请输入收藏夹排序号！",true);
+        }
+        Object tokenValue = redisTemplate.opsForValue().get(vo.getUserName());
         if (StringUtils.isEmpty(tokenValue)){
             return new SysResult(200,"请先登录！",true);
         }
@@ -118,16 +126,16 @@ public class AuctionImpl implements AuctionService {
         JSONObject favoriteult = JSONObject.parseObject(favoriteStr);
         Map<String, Object> resultMap = (Map<String, Object>) favoriteult.get("data");
         List<Map<String, Map<String, Object>>> favoriteList = (List<Map<String, Map<String, Object>>>) resultMap.get("list");
-        Map<String, Map<String, Object>> map1 = favoriteList.get(Integer.valueOf(auctionVO.getAdPositionId()) - 1);
+        Map<String, Map<String, Object>> map1 = favoriteList.get(Integer.parseInt(vo.getAdPositionId()) - 1);
         Map<String, Object> map2 = map1.get("AdPositionCompetePre");
         Object id1 = map2.get("Id");
         id = id1.toString();
-        System.out.println("收藏夹id为：" + id + map2.get("AdName"));
+        log.info("收藏夹id={},AdName={}",id,map2.get("AdName"));
 
         // 是否已竞拍过
-        String isAuction = (String) redisTemplate.opsForValue().get(IS_AUCTION + auctionVO.getUserName() + id);
+        String isAuction = (String) redisTemplate.opsForValue().get(IS_AUCTION + vo.getUserName() + id);
         if (!StringUtils.isEmpty(isAuction)){
-            System.out.println("已竞拍成功,此次不会覆盖");
+            log.info("已竞拍成功,此次不会覆盖");
             return new SysResult(200, "已竞拍成功,此次不会覆盖", true);
         }
 
@@ -141,7 +149,7 @@ public class AuctionImpl implements AuctionService {
         String password = "19961314520";
         //图片转换过的base64编码
         String image = base64;
-        System.out.println("图片base64 = "+ image);
+        log.info("图片base64={}",image);
         JSONObject obj = new JSONObject();
         obj.put("username", username);
         obj.put("password", password);
@@ -154,7 +162,7 @@ public class AuctionImpl implements AuctionService {
             JSONObject jsonObject = JSONObject.parseObject(ret);
             if (jsonObject.getBoolean("success")) {
                 String resultCode = jsonObject.getJSONObject("data").getString("result");
-                System.out.println("识别成功结果为:" + resultCode);
+                log.info("识别成功结果为={}" + resultCode);
 
                 //  竞标
                 String url1 = "https://sz.centanet.com/partner/jifen/AdPosition/AuctionNewPre?id=" + id + "&verifyCode=" + resultCode;
@@ -163,11 +171,12 @@ public class AuctionImpl implements AuctionService {
                 // 记录成功 {"code":0,"msg":"success","data":{"IsSuccess":true,"Reamark":"参与成功，将有机会拍得此广告位！"}}
                 JSONObject jbJson = JSON.parseObject(resultJB);
                 if (jbJson.getJSONObject("data").getBoolean("IsSuccess")){
-                    redisTemplate.opsForValue().set(IS_AUCTION + auctionVO.getUserName() + id, resultJB, 1, TimeUnit.HOURS);
+                    log.info("-------竞拍成功");
+                    redisTemplate.opsForValue().set(IS_AUCTION + vo.getUserName() + id, resultJB, 1, TimeUnit.HOURS);
                 }
 
                 // 添加竞标记录
-                UserPower userPower = userPowerMapper.selectOne(new QueryWrapper<UserPower>().eq("user_name", auctionVO.getUserName()));
+                UserPower userPower = userPowerMapper.selectOne(new QueryWrapper<UserPower>().eq("user_name", vo.getUserName()));
                 UserPowerLog userPowerLog = new UserPowerLog();
                 userPowerLog.setUserId(userPower.getId());
                 userPowerLog.setUserNick(userPower.getUserNick());
@@ -176,35 +185,36 @@ public class AuctionImpl implements AuctionService {
                 return new SysResult(200, resultJB, true);
 
             } else {
-                System.out.println("识别失败原因为:" + jsonObject.getString("message"));
+                log.error("识别失败原因为={}" + jsonObject.getString("message"));
                 return new SysResult(200, "验证码识别失败", true);
             }
         } catch (Exception e) {
-            System.out.println("识别失败异常:");
+            log.error("识别失败异常:");
             return new SysResult(200, "验证码识别异常", true);
         }
 
     }
 
     @Override
-    public SysResult login(AuctionVO auctionVO) {
-        System.out.println("登录保存token到redis-------------------------");
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd :hh:mm:ss");
-        System.out.println("登录入参数----------" + auctionVO + dateFormat.format(new Date()));
+    public SysResult login(AuctionVO vo) {
+        log.info("--------登录入参数={}" , vo.toString());
+        if (StringUtils.isEmpty(vo.getUserName()) || StringUtils.isEmpty(vo.getUserPwd())){
+            return new SysResult(200,"请输入账号密码！",true);
+        }
         // 是否有权限
-        UserPower userPower = userPowerMapper.selectOne(new QueryWrapper<UserPower>().eq("user_name", auctionVO.getUserName()));
+        UserPower userPower = userPowerMapper.selectOne(new QueryWrapper<UserPower>().eq("user_name", vo.getUserName()));
         if (StringUtils.isEmpty(userPower)){
-            System.out.println("没有权限--------");
+            log.info("没有权限--------");
             return new SysResult(200, "没有权限，请联系管理员QQ:761091243", true);
         }
         // 验证账号密码是否正确
-        String token = RequestUtil.login(auctionVO.getUserName(), auctionVO.getUserPwd());
+        String token = RequestUtil.login(vo.getUserName(), vo.getUserPwd());
         if (StringUtils.isEmpty(token)) {
             return new SysResult(200, "账号或密码错误", true);
         }
         // 添加token到redis（key是用户名）
-        redisTemplate.opsForValue().set(auctionVO.getUserName(), token, 1, TimeUnit.HOURS);
-        System.out.println("登录成功-------------------------");
+        redisTemplate.opsForValue().set(vo.getUserName(), token, 1, TimeUnit.HOURS);
+        log.info("登录成功---------------");
         return new SysResult(200, "登录成功，有效期为1个小时", true);
     }
 }

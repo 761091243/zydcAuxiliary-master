@@ -32,7 +32,6 @@ public class AutoSignScheduled {
 
 
 
-//    @Scheduled(cron = "0/5 * * * * ?")
     @Scheduled(cron = "0 0 8 * * ?")
     private void configureTasks() {
         System.err.println("--------执行静态定时任务时间: " + LocalDateTime.now());

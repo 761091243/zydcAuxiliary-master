@@ -1,6 +1,9 @@
 package com.wangpeng;
 
 import com.alibaba.fastjson.JSONObject;
+import com.wangpeng.config.SysResult;
+import com.wangpeng.pojo.AuctionVO;
+import com.wangpeng.service.impl.AuctionImpl;
 import com.wangpeng.utils.HttpUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -18,7 +21,8 @@ class ZydcAuxiliary2ApplicationTests {
 
     @Autowired
     private RedisTemplate redisTemplate;
-
+    @Autowired
+    private AuctionImpl auctionService;
 
     private static final String IS_AUCTION = "Auction:";
 
@@ -99,6 +103,12 @@ class ZydcAuxiliary2ApplicationTests {
     @Test
     public void redisDemo1(){
         redisTemplate.opsForValue().set(IS_AUCTION + "18820241680" + "666","cg",1, TimeUnit.HOURS);
+    }
+
+    @Test
+    public void dee(){
+        SysResult favorite = auctionService.favorite(new AuctionVO());
+
     }
 
 }
