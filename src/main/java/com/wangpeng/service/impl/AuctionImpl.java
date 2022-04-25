@@ -126,6 +126,9 @@ public class AuctionImpl implements AuctionService {
         JSONObject favoriteult = JSONObject.parseObject(favoriteStr);
         Map<String, Object> resultMap = (Map<String, Object>) favoriteult.get("data");
         List<Map<String, Map<String, Object>>> favoriteList = (List<Map<String, Map<String, Object>>>) resultMap.get("list");
+        if (Integer.parseInt(vo.getAdPositionId()) > favoriteList.size()){
+            return new SysResult(200,"请输入正确的收藏夹排序号！",true);
+        }
         Map<String, Map<String, Object>> map1 = favoriteList.get(Integer.parseInt(vo.getAdPositionId()) - 1);
         Map<String, Object> map2 = map1.get("AdPositionCompetePre");
         Object id1 = map2.get("Id");

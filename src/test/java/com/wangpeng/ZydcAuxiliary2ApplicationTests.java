@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {ZydcAuxiliary2Application.class})
+@SpringBootTest(classes = {ZydcAuxiliaryApp.class})
 class ZydcAuxiliary2ApplicationTests {
 
     @Autowired
@@ -107,7 +107,11 @@ class ZydcAuxiliary2ApplicationTests {
 
     @Test
     public void dee(){
-        SysResult favorite = auctionService.favorite(new AuctionVO());
+        AuctionVO vo = new AuctionVO();
+        vo.setUserName("139872");
+        vo.setUserPwd("1111111");
+        vo.setAdPositionId("4");
+        SysResult favorite = auctionService.favorite(vo);
 
     }
 

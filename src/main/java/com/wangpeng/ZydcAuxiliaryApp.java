@@ -11,12 +11,15 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 
+/**
+ * @author Dunn
+ */
 @SpringBootApplication
 @MapperScan("com.wangpeng.mapper")
-public class ZydcAuxiliary2Application {
+public class ZydcAuxiliaryApp {
 
     public static void main(String[] args) {
-        SpringApplication.run(ZydcAuxiliary2Application.class, args);
+        SpringApplication.run(ZydcAuxiliaryApp.class, args);
     }
 
     @Bean
