@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -53,22 +54,12 @@ public class RequestLogFilter extends OncePerRequestFilter {
 
 
 	}
-	/*@Override
+	@Override
 	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-		boolean result = new AntPathMatcher().match("/merchantManage/download-pic", request.getServletPath());
-		boolean result2 = new AntPathMatcher().match("/couponManage/uploadFile", request.getServletPath());
-		boolean result3 = new AntPathMatcher().match("/allowance/merchant/batch", request.getServletPath());
-		boolean result4 = new AntPathMatcher().match("/activity/uploadview", request.getServletPath());
-		boolean result5 = new AntPathMatcher().match("/activity/uploadFile", request.getServletPath());
-		boolean result6 = new AntPathMatcher().match("/couponManage/downFile", request.getServletPath());
-		boolean result7 = new AntPathMatcher().match("/bankDownloadRecord/download-file", request.getServletPath());
-		boolean result8 = new AntPathMatcher().match("/bank/add/batch", request.getServletPath());
-		boolean result9 = new AntPathMatcher().match("/merchantManage/batch/update", request.getServletPath());
-		boolean result10 = new AntPathMatcher().match("/merchantManage/batch/addMerchant", request.getServletPath());
-		boolean result11 = new AntPathMatcher().match("/merchantManage/batch/addBoundMerchant", request.getServletPath());
-		boolean result12 = new AntPathMatcher().match("/allowance/quotaVerify/batchAdd", request.getServletPath());
-		boolean result13 = new AntPathMatcher().match("/merchantManage/batch/modifyBindStatus", request.getServletPath());
-		return result||result2||result3||result4||result5||result6||result7||result8||result9||result10||result11||result12||result13;
-	}*/
+		boolean result = new AntPathMatcher().match("/static/**", request.getServletPath());
+		boolean result2 = new AntPathMatcher().match("/index/**", request.getServletPath());
+
+		return result||result2;
+	}
 
 }
